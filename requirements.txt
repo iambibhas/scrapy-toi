@@ -2,10 +2,13 @@ asn1crypto==0.22.0
 attrs==17.2.0
 Automat==0.6.0
 backports.shutil-get-terminal-size==1.0.0
+certifi==2017.7.27.1
 cffi==1.10.0
+chardet==3.0.4
 constantly==15.1.0
 cryptography==2.0.3
 cssselect==1.0.1
+dateutils==0.6.6
 decorator==4.1.2
 enum34==1.1.6
 fake-useragent==0.1.7
@@ -29,7 +32,10 @@ pycparser==2.18
 PyDispatcher==2.0.5
 Pygments==2.2.0
 pyOpenSSL==17.2.0
+python-dateutil==2.6.1
+pytz==2017.2
 queuelib==1.4.2
+requests==2.18.4
 scandir==1.5
 Scrapy==1.4.0
 scrapy-fake-useragent==1.1.0
@@ -38,6 +44,7 @@ simplegeneric==0.8.1
 six==1.10.0
 traitlets==4.3.2
 Twisted==17.5.0
+urllib3==1.22
 w3lib==1.18.0
 wcwidth==0.1.7
 zope.interface==4.4.2
