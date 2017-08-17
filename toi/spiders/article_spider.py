@@ -3,8 +3,9 @@ import itertools
 import datetime
 import calendar
 
-MONTHS = [7]  # range(1, 13)
-YEARS = [2001]  # range(2001, 2018)
+
+MONTHS = range(1, 13)
+YEARS = range(2002, 2017)
 BASE_DATE = datetime.date(1899, 12, 30)
 CURRENT_DATE = datetime.date.today()
 VALID_END_DATE = CURRENT_DATE - datetime.timedelta(days=2)
@@ -35,5 +36,30 @@ class ArticleSpider(scrapy.Spider):
                 yield scrapy.Request(url=article_url, callback=self.parse)
         elif 'articleshow' in response.url:
             # this is an article page
-            body = response.xpath('//div[@class="main-content"]')
-            yield {'url': response.url, 'body': body}
+            content = response.xpath('//div[@class="main-content"]')
+            title = content.xpath('//h1[@class="heading1"]/text()').extract_first()
+
+            if not title:
+                raise Exception('No Title Found!')
+
+            published_dt = content.xpath('//span[@itemprop="datePublished"]/text()').extract_first()
+
+            if not published_dt:
+                published_dt_text = content.xpath('//span[@class="time_cptn"]/text()').extract_first()
+                dt_parts = published_dt_text.split(' | ')
+                published_dt = dt_parts[-1]
+
+            if not published_dt:
+                published_dt_text = content.xpath('//span[@class="time_cptn"]//span/text()').extract()
+                published_dt = published_dt_text[-1]
+
+            parsed_dt = ''
+            if published_dt:
+                try:
+                    parsed_dt = datetime.datetime.strptime(published_dt, '%b %d, %Y, %I.%M %p IST').isoformat()
+                except:
+                    raise Exception('Cannot parse datetime: %s' % published_dt)
+
+            body = content.xpath('//div[contains(@class, "article_content") or @itemprop="articleBody"]').extract_first()
+
+            yield {'url': response.url, 'title': title, 'published_dt': parsed_dt, 'body': body}
