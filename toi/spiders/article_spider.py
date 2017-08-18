@@ -1,4 +1,5 @@
 import re
+import urlparse
 import scrapy
 import itertools
 import datetime
@@ -37,7 +38,7 @@ class ArticleSpider(scrapy.Spider):
             # it's an archive page
             for article_url in response.xpath('//a[contains(@href, "articleshow")]/@href').extract():
                 if 'timesofindia.indiatimes.com' not in article_url:
-                    article_url = 'http://timesofindia.indiatimes.com' + article_url
+                    article_url = urlparse.urljoin('http://timesofindia.indiatimes.com', article_url)
                 yield scrapy.Request(url=article_url, callback=self.parse)
         elif 'articleshow' in response.url:
             # this is an article page
