@@ -1,8 +1,10 @@
+import re
 import scrapy
 import itertools
 import datetime
 import calendar
 from dateutil import parser
+from BeautifulSoup import BeautifulSoup
 
 
 MONTHS = range(1, 13)
@@ -28,7 +30,7 @@ class ArticleSpider(scrapy.Spider):
                 dt_delta = compare_date - BASE_DATE
                 delta = dt_delta.days
                 url = monthly_url_template.format(year=year, month=month, date=date, delta=delta)
-            yield scrapy.Request(url=url, callback=self.parse)
+                yield scrapy.Request(url=url, callback=self.parse)
 
     def parse(self, response):
         if 'starttime' in response.url:
@@ -68,4 +70,10 @@ class ArticleSpider(scrapy.Spider):
 
             body = response.xpath('//div[contains(@class, "article_content") or @itemprop="articleBody"]').extract_first()
 
-            yield {'url': response.url, 'title': title, 'published_dt': parsed_dt, 'body': body}
+            yield {'url': response.url, 'title': title, 'published_dt': parsed_dt, 'body': body, 'text': self.cleanup_html(body)}
+
+    def cleanup_html(self, html):
+        soup = BeautifulSoup(html)
+        html_removed = ''.join(soup.findAll(text=True))
+        cleaned_up = re.sub('\s+', ' ', html_removed).strip().replace('&amp;', '&')
+        return cleaned_up
